@@ -7,22 +7,18 @@ from typing import List
 import re
 import logging
 from os import environ
-import mysql.connector
 
 
 def filter_datum(fields: List[str], redaction: str,
                  message: str, separator: str) -> str:
-    """
-    Returns the log message obfuscated.
-    """
+    """Returns the log message obfuscated."""
     pattern = '|'.join([f"{field}=[^{separator}]*" for field in fields])
     return re.sub(pattern,
                   lambda m: f"{m.group().split('=')[0]}={redaction}", message)
 
 
 class RedactingFormatter(logging.Formatter):
-    """ Redacting Formatter class
-    """
+    """ Redacting Formatter class. """
 
     REDACTION = "***"
     FORMAT = "[HOLBERTON] %(name)s %(levelname)s %(asctime)-15s: %(message)s"
@@ -42,9 +38,7 @@ PII_FIELDS = ("name", "email", "phone", "ssn", "password")
 
 
 def get_logger() -> logging.Logger:
-    """
-    Returns a logger object.
-    """
+    """Returns a logger object."""
     logger = logging.getLogger("user_data")
     logger.setLevel(logging.INFO)
     logger.propagate = False
