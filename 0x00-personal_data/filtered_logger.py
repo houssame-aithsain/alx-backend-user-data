@@ -3,8 +3,8 @@
 Module for filtering log messages.
 """
 
-import re
 import logging
+import re
 from typing import List
 
 
