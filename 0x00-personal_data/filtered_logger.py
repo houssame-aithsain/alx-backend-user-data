@@ -36,3 +36,47 @@ class RedactingFormatter(logging.Formatter):
         record.msg = filter_datum(self.fields, self.REDACTION,
                                   record.getMessage(), self.SEPARATOR)
         return super(RedactingFormatter, self).format(record)
+
+
+def get_logger() -> logging.Logger:
+    """Configures and returns a logger for enabled."""
+    logger = logging.getLogger("user_data")
+    logger.setLevel(logging.INFO)
+    logger.propagate = False
+
+    handler = logging.StreamHandler()
+    handler.setFormatter(RedactingFormatter(fields=PII_FIELDS))
+    logger.addHandler(handler)
+
+    return logger
+
+
+def get_db() -> mysql.connector.connection.MySQLConnection:
+    """Creates and returns a connection to the personal data MySQL database."""
+    return mysql.connector.connect(
+        user=environ.get("PERSONAL_DATA_DB_USERNAME", "root"),
+        password=environ.get("PERSONAL_DATA_DB_PASSWORD", ""),
+        host=environ.get("PERSONAL_DATA_DB_HOST", "localhost"),
+        database=environ.get("PERSONAL_DATA_DB_NAME")
+    )
+
+
+def main():
+    """Connects to the database, retrieves and logs."""
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM users;")
+    column_names = [col[0] for col in cursor.description]
+    logger = get_logger()
+
+    for row in cursor:
+        row_data = "; ".join(f"{name}={value}" for name,
+                             value in zip(column_names, row))
+        logger.info(row_data + ";")
+
+    cursor.close()
+    db.close()
+
+
+if __name__ == '__main__':
+    main()
