@@ -4,8 +4,10 @@ Module for filtering log messages.
 """
 
 from typing import List
-import logging
 import re
+import logging
+from os import environ
+import mysql.connector
 
 
 def filter_datum(fields: List[str], redaction: str,
