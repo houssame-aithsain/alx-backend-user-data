@@ -20,13 +20,6 @@ def unauthorized():
     abort(401)
 
 
-@app_views.route('/forbidden', methods=['GET'], strict_slashes=False)
-def forbidden():
-    """GET /api/v1/forbidden
-    Raises a 403 error"""
-    abort(403)
-
-
 @app_views.route('/stats/', strict_slashes=False)
 def stats() -> str:
     """GET /api/v1/stats
