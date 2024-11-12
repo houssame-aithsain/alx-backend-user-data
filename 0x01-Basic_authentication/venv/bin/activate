@@ -39,10 +39,10 @@ deactivate nondestructive
 if [ "${OSTYPE:-}" = "cygwin" ] || [ "${OSTYPE:-}" = "msys" ] ; then
     # transform D:\path\to\venv to /d/path/to/venv on MSYS
     # and to /cygdrive/d/path/to/venv on Cygwin
-    export VIRTUAL_ENV=$(cygpath "/home/elpira/Desktop/alx-backend-user-data/0x01-Basic_authentication/SimpleAPI/venv")
+    export VIRTUAL_ENV=$(cygpath "/home/elpira/Desktop/alx-backend-user-data/0x01-Basic_authentication/venv")
 else
     # use the path as-is
-    export VIRTUAL_ENV="/home/elpira/Desktop/alx-backend-user-data/0x01-Basic_authentication/SimpleAPI/venv"
+    export VIRTUAL_ENV="/home/elpira/Desktop/alx-backend-user-data/0x01-Basic_authentication/venv"
 fi
 
 _OLD_VIRTUAL_PATH="$PATH"
