@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 """
-Route module for the API
+API Routing module.
 """
 from os import getenv
-from api.v1.views import app_views
 from flask import Flask, jsonify, abort, request
-from flask_cors import (CORS, cross_origin)
-import os
+from flask_cors import CORS
+from api.v1.views import app_views
 from api.v1.auth.auth import Auth
 from api.v1.auth.basic_auth import BasicAuth
 
@@ -14,38 +13,40 @@ from api.v1.auth.basic_auth import BasicAuth
 app = Flask(__name__)
 app.register_blueprint(app_views)
 CORS(app, resources={r"/api/v1/*": {"origins": "*"}})
+
+
+# Initialize authentication type based on environment variable
 auth = None
 auth_type = getenv('AUTH_TYPE', 'auth')
 if auth_type == 'auth':
     auth = Auth()
-if auth_type == 'basic_auth':
+elif auth_type == 'basic_auth':
     auth = BasicAuth()
 
 
 @app.errorhandler(401)
-def unauthorized(error) -> str:
-    """Unauthorized handler.
-    """
+def handle_unauthorized(error) -> str:
+    """Handles 401 Unauthorized errors with a JSON response."""
     return jsonify({"error": "Unauthorized"}), 401
 
 
 @app.errorhandler(403)
-def forbidden(error) -> str:
-    """Forbidden handler.
-    """
+def handle_forbidden(error) -> str:
+    """Handles 403 Forbidden errors with a JSON response."""
     return jsonify({"error": "Forbidden"}), 403
 
 
 @app.errorhandler(404)
-def not_found(error) -> str:
-    """ Not found handler
-    """
+def handle_not_found(error) -> str:
+    """Handles 404 Not Found errors with a JSON response."""
     return jsonify({"error": "Not found"}), 404
 
 
 @app.before_request
 def authenticate_user():
-    """Authenticates a user before processing a request.
+    """
+    Authenticates user before processing each request.
+    If authentication is required but missing.
     """
     if auth:
         excluded_paths = [
