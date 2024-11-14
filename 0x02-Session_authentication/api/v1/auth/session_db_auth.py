@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """
-Define class SessionDButh
+Defines the SessionDBAuth class that manages sessions with persistent storage
+in a database.
 """
 from .session_exp_auth import SessionExpAuth
 from models.user_session import UserSession
@@ -8,15 +9,19 @@ from models.user_session import UserSession
 
 class SessionDBAuth(SessionExpAuth):
     """
-    Definition of SessionDBAuth class that persists session data
-    in a database
+    Implements session authentication with persistence by storing session data
+    in a database.
     """
 
     def create_session(self, user_id=None):
         """
-        Create a Session ID for a user_id
+        Creates a Session ID for a given user_id and stores it in the database.
+
         Args:
-           user_id (str): user id
+            user_id (str): The ID of the user for whom the session is being created
+
+        Returns:
+            str: Session ID if successful, None otherwise
         """
         session_id = super().create_session(user_id)
         if not session_id:
@@ -26,26 +31,33 @@ class SessionDBAuth(SessionExpAuth):
             "session_id": session_id
         }
         user = UserSession(**kw)
-        user.save()
+        user.save()  # Persist the session data in the database
         return session_id
 
     def user_id_for_session_id(self, session_id=None):
         """
-        Returns a user ID based on a session ID
+        Retrieves the user ID associated with a given session ID.
+
         Args:
-            session_id (str): session ID
-        Return:
-            user id or None if session_id is None or not a string
+            session_id (str): The session ID to look up
+
+        Returns:
+            str: User ID associated with the session ID, or None if not found
         """
         user_id = UserSession.search({"session_id": session_id})
         if user_id:
-            return user_id
+            return user_id[0].user_id  # Return the user_id from the session data
         return None
 
     def destroy_session(self, request=None):
         """
-        Destroy a UserSession instance based on a
-        Session ID from a request cookie
+        Destroys the user session based on the session ID in the request's cookie.
+
+        Args:
+            request: The request object containing the session cookie
+
+        Returns:
+            bool: True if the session was successfully destroyed, False otherwise
         """
         if request is None:
             return False
@@ -54,6 +66,6 @@ class SessionDBAuth(SessionExpAuth):
             return False
         user_session = UserSession.search({"session_id": session_id})
         if user_session:
-            user_session[0].remove()
+            user_session[0].remove()  # Remove the session from the database
             return True
         return False
