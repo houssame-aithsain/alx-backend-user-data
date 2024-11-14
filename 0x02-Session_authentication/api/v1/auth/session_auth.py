@@ -51,7 +51,7 @@ class SessionAuth(Auth):
         Args:
             request: The request object containing the session cookie
         Returns:
-            User: The User instance associated with the session, or None if not found
+            User: The User instance associated with the session
         """
         session_cookie = self.session_cookie(request)
         user_id = self.user_id_for_session_id(session_cookie)
