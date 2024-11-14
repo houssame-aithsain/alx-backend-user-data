@@ -12,7 +12,7 @@ from models.user import User
 def auth_session():
     """
     Handles user login by verifying email and password.
-    
+
     Returns:
         JSON response containing user data if authentication is successful.
         JSON error response if email or password is missing, user not found,
@@ -20,16 +20,16 @@ def auth_session():
     """
     email = request.form.get('email')
     password = request.form.get('password')
-    
+
     if not email:
         return jsonify({"error": "email missing"}), 400
     if not password:
         return jsonify({"error": "password missing"}), 400
-    
+
     users = User.search({"email": email})
     if not users:
         return jsonify({"error": "no user found for this email"}), 404
-    
+
     for user in users:
         if user.is_valid_password(password):
             from api.v1.app import auth
@@ -38,7 +38,7 @@ def auth_session():
             session_name = os.getenv('SESSION_NAME')
             resp.set_cookie(session_name, session_id)
             return resp
-    
+
     return jsonify({"error": "wrong password"}), 401
 
 
@@ -46,7 +46,7 @@ def auth_session():
 def handle_logout():
     """
     Handles user logout by destroying the session.
-    
+
     Returns:
         200 status code with empty JSON if logout is successful.
         404 error if session cannot be destroyed.
