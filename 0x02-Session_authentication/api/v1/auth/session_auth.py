@@ -52,7 +52,7 @@ class SessionAuth(Auth):
             request: The request object containing session data.
 
         Returns:
-            User: The User instance linked to the session, or None if unavailable.
+            User: The User instance linked to the session.
         """
         session_cookie = self.session_cookie(request)
         user_id = self.user_id_for_session_id(session_cookie)
@@ -66,7 +66,7 @@ class SessionAuth(Auth):
             request: The request object containing session data.
 
         Returns:
-            bool: True if the session was successfully terminated, otherwise False.
+            bool: True if the session was successfully terminated.
         """
         if request is None:
             return False
