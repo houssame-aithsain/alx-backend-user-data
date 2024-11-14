@@ -15,9 +15,9 @@ class UserSession(Base):
         Initializes a UserSession instance with user_id and session_id.
 
         Args:
-            *args: Variable length argument list (passed to the parent constructor)
-            **kwargs: Dictionary of keyword arguments containing user_id and session_id.
+            *args: Variable length argument
+            **kwargs: Dictionary of keyword.
         """
         super().__init__(*args, **kwargs)
-        self.user_id = kwargs.get('user_id')  # User ID associated with the session
-        self.session_id = kwargs.get('session_id')  # Unique session ID for the user
+        self.user_id = kwargs.get('user_id')  # User ID
+        self.session_id = kwargs.get('session_id')  # Unique session
