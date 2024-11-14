@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Define SessionExpAuth class
+SessionExpAuth class for session handling with expiration.
 """
 import os
 from datetime import datetime, timedelta
@@ -9,12 +9,12 @@ from .session_auth import SessionAuth
 
 class SessionExpAuth(SessionAuth):
     """
-    Class that adds an expiration date to a Session ID for session management.
+    Manages sessions with an expiration time.
     """
 
     def __init__(self):
         """
-        Initializes the SessionExpAuth class with a session duration.
+        Sets the session duration from environment variables, defaulting to 0.
         """
         try:
             self.session_duration = int(os.getenv('SESSION_DURATION', 0))
@@ -23,13 +23,13 @@ class SessionExpAuth(SessionAuth):
 
     def create_session(self, user_id=None):
         """
-        Creates a Session ID for a given user ID, adding an expiration timestamp.
+        Creates a session ID with an expiration timestamp for a user.
 
         Args:
-            user_id (str): User's ID
+            user_id (str): The ID of the user
 
         Returns:
-            str: Session ID, or None if user_id is invalid
+            str: The session ID, or None if user_id is invalid.
         """
         session_id = super().create_session(user_id)
         if session_id is None:
@@ -43,13 +43,13 @@ class SessionExpAuth(SessionAuth):
 
     def user_id_for_session_id(self, session_id=None):
         """
-        Retrieves a user ID based on the session ID, considering session expiration.
-        
+        Retrieves the user ID for a session, considering expiration.
+
         Args:
             session_id (str): The session ID
-        
+
         Returns:
-            str: User ID if session is valid, otherwise None
+            str: User ID if session is valid, otherwise None.
         """
         if session_id is None:
             return None
@@ -58,6 +58,7 @@ class SessionExpAuth(SessionAuth):
         if not user_details or "created_at" not in user_details:
             return None
 
+        # Check if session is expired
         if self.session_duration <= 0:
             return user_details.get("user_id")
 
