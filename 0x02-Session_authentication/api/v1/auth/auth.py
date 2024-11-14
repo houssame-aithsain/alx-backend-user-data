@@ -16,7 +16,7 @@ class Auth:
 
         Args:
             path (str): The URL path to check.
-            excluded_paths (List[str]): A list of paths that do not require authentication.
+            excluded_paths (List[str]): do not require authentication.
 
         Returns:
             bool: True if the path requires authentication, False otherwise.
