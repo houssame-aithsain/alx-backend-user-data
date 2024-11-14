@@ -18,7 +18,7 @@ class SessionDBAuth(SessionExpAuth):
         Creates a Session ID for a given user_id and stores it in the database.
 
         Args:
-            user_id (str): The ID of the user for whom the session is being created
+            user_id (str): session is being created
 
         Returns:
             str: Session ID if successful, None otherwise
@@ -46,18 +46,18 @@ class SessionDBAuth(SessionExpAuth):
         """
         user_id = UserSession.search({"session_id": session_id})
         if user_id:
-            return user_id[0].user_id  # Return the user_id from the session data
+            return user_id[0].user_id  #  user_id from the session data
         return None
 
     def destroy_session(self, request=None):
         """
-        Destroys the user session based on the session ID in the request's cookie.
+        Destroys the user session based on the session.
 
         Args:
             request: The request object containing the session cookie
 
         Returns:
-            bool: True if the session was successfully destroyed, False otherwise
+            bool: True if the session was successfully destroyed
         """
         if request is None:
             return False
