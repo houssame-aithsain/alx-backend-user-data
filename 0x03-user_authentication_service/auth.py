@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Authentication module to manage user registration, login, and session handling."""
+"""Authentication module to manage user registration."""
 
 import logging
 from typing import Union
@@ -36,7 +36,7 @@ def generate_uuid() -> str:
 
 
 class Auth:
-    """Handles user authentication operations: registration, login, and session management."""
+    """Handles user authentication operations: registration."""
 
     def __init__(self):
         self._db = DB()
@@ -81,8 +81,9 @@ class Auth:
             # Attempt to retrieve the user by email
             user = self._db.find_user_by(email=email)
             if user:
-                # Check if the provided password matches the stored hashed password
-                return bcrypt.checkpw(plain_password.encode('utf-8'), user.hashed_password)
+                # Check if the provided password matches.
+                return bcrypt.checkpw(plain_password.encode('utf-8'),
+                                      user.hashed_password)
         except NoResultFound:
             return False
 
@@ -177,4 +178,5 @@ class Auth:
         # Hash the new password
         new_hashed_password = hash_password(new_password)
         # Update the user's password and reset token
-        self._db.update_user(user.id, hashed_password=new_hashed_password, reset_token=None)
+        self._db.update_user(user.id, hashed_password=new_hashed_password,
+                             reset_token=None)
