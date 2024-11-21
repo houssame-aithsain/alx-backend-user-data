@@ -20,7 +20,7 @@ class DatabaseManager:
         Sets up the database engine and schema.
         """
         self._engine = create_engine("sqlite:///users.db")
-        Base.metadata.drop_all(self._engine)  # Reset the database for fresh use
+        Base.metadata.drop_all(self._engine)
         Base.metadata.create_all(self._engine)  # Create all tables
         self._session_instance = None
 
