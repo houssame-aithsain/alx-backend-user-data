@@ -4,7 +4,7 @@ For users
 """
 
 from sqlalchemy import create_engine
-from sqlalchemy import declarative_base
+from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String
 # id, the integer primary key
 # email, a non-nullable string
