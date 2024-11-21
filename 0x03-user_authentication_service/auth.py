@@ -12,16 +12,16 @@ from user import User
 logging.disable(logging.WARNING)
 
 
-def _hash_password(plain_password: str) -> bytes:
+def _hash_password(password: str) -> bytes:
     """Hashes a password using bcrypt.
 
     Args:
-        plain_password (str): The plain text password.
+        password (str): The plain text password.
 
     Returns:
         bytes: The hashed password.
     """
-    return bcrypt.hashpw(plain_password.encode("utf-8"), bcrypt.gensalt())
+    return bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
 
 
 def _generate_uuid() -> str:
@@ -39,12 +39,12 @@ class Auth:
     def __init__(self):
         self._db = DB()
 
-    def register_user(self, email: str, plain_password: str) -> User:
+    def register_user(self, email: str, password: str) -> User:
         """Registers a new user with an email and password.
 
         Args:
             email (str): The user's email.
-            plain_password (str): The user's plain text password.
+            password (str): The user's plain text password.
 
         Returns:
             User: The registered user object.
@@ -58,15 +58,15 @@ class Auth:
         except NoResultFound:
             pass
 
-        hashed_password = _hash_password(plain_password)
+        hashed_password = _hash_password(password)
         return self._db.add_user(email, hashed_password)
 
-    def valid_login(self, email: str, plain_password: str) -> bool:
+    def valid_login(self, email: str, password: str) -> bool:
         """Validates a user's login credentials.
 
         Args:
             email (str): The user's email.
-            plain_password (str): The user's plain text password.
+            password (str): The user's plain text password.
 
         Returns:
             bool: True if the credentials are valid, False otherwise.
@@ -74,7 +74,7 @@ class Auth:
         try:
             user = self._db.find_user_by(email=email)
             if user:
-                return bcrypt.checkpw(plain_password.encode('utf-8'),
+                return bcrypt.checkpw(password.encode('utf-8'),
                                       user.hashed_password)
         except NoResultFound:
             return False
