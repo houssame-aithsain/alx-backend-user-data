@@ -6,7 +6,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.session import Session
 from user import User
-
+from sqlalchemy.exc import InvalidRequestError, NoResultFound
 from user import Base
 
 
@@ -38,3 +38,16 @@ class DB:
         session.add(user)
         session.commit()
         return user
+
+    def find_user_by(self, **kwargs):
+        if len(kwargs) != 1:
+            raise InvalidRequestError
+        
+        fieldName, value = list(kwargs.items())[0]
+        for atr in User.__dir__():
+            if atr == fieldName:
+                try:
+                    User(fieldName=value)
+                except Exception as a:
+                    raise NoResultFound
+        raise InvalidRequestError
