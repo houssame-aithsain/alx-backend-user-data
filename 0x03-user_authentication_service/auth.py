@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Authentication module to manage user registration."""
 
 import logging
@@ -55,16 +54,12 @@ class Auth:
             ValueError: If the email is already registered.
         """
         try:
-            # Check if the user already exists by email
             self._db.find_user_by(email=email)
             raise ValueError(f"User with email {email} already exists")
         except NoResultFound:
-            # Continue if no existing user is found
             pass
 
-        # Hash the password before storing
         hashed_password = hash_password(plain_password)
-        # Add user to the database and return the user object
         return self._db.add_user(email, hashed_password)
 
     def valid_login(self, email: str, plain_password: str) -> bool:
@@ -78,10 +73,8 @@ class Auth:
             bool: True if the credentials are valid, False otherwise.
         """
         try:
-            # Attempt to retrieve the user by email
             user = self._db.find_user_by(email=email)
             if user:
-                # Check if the provided password matches.
                 return bcrypt.checkpw(plain_password.encode('utf-8'),
                                       user.hashed_password)
         except NoResultFound:
@@ -99,12 +92,10 @@ class Auth:
             str: The new session ID or None if user not found.
         """
         try:
-            # Retrieve the user by email
             user = self._db.find_user_by(email=email)
         except NoResultFound:
             return None
 
-        # Generate a session ID and store it
         session_id = generate_uuid()
         self._db.update_user(user.id, session_id=session_id)
         return session_id
@@ -122,7 +113,6 @@ class Auth:
             return None
 
         try:
-            # Find the user by session ID
             return self._db.find_user_by(session_id=session_id)
         except NoResultFound:
             return None
@@ -149,12 +139,10 @@ class Auth:
             str: The reset token.
         """
         try:
-            # Retrieve the user by email
             user = self._db.find_user_by(email=email)
         except NoResultFound:
             raise ValueError("User with this email does not exist")
 
-        # Generate and update the reset token
         reset_token = generate_uuid()
         self._db.update_user(user.id, reset_token=reset_token)
         return reset_token
@@ -170,13 +158,10 @@ class Auth:
             ValueError: If the reset token is invalid.
         """
         try:
-            # Find the user by reset token
             user = self._db.find_user_by(reset_token=reset_token)
         except NoResultFound:
             raise ValueError("Invalid reset token")
 
-        # Hash the new password
         new_hashed_password = hash_password(new_password)
-        # Update the user's password and reset token
         self._db.update_user(user.id, hashed_password=new_hashed_password,
                              reset_token=None)
