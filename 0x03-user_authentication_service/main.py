@@ -3,8 +3,8 @@
 """
 
 import requests
-
 from app import AUTH
+
 
 EMAIL = "guillaume@holberton.io"
 PASSWD = "b4l0u"
