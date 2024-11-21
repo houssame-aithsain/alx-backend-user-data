@@ -106,7 +106,8 @@ def request_password_reset(email: str) -> str:
     return reset_token
 
 
-def update_user_password(email: str, reset_token: str, new_password: str) -> None:
+def update_user_password(email: str, reset_token: str,
+                         new_password: str) -> None:
     """Test the process of updating the user's password using a reset token.
 
     Args:
