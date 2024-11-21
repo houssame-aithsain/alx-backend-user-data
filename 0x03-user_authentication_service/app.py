@@ -133,7 +133,8 @@ def update_user_password() -> str:
         # Invalid reset token, return forbidden error
         abort(403)
 
-    return jsonify({"email": email, "message": "Password updated successfully"})
+    return jsonify({"email": email,
+                    "message": "Password updated successfully"})
 
 
 if __name__ == "__main__":
