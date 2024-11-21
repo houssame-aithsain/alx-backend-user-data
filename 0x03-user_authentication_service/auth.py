@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Authentication module for managing user registration, login, and session handling.
+Authentication module for managing user registration.
 """
 import bcrypt
 from db import DatabaseManager
@@ -68,7 +68,7 @@ class AuthenticationService:
             email (str): The user's email address.
 
         Returns:
-            str: The session ID for the user, or None if the user does not exist.
+            str: The session ID for the user.
         """
         try:
             user = self._db_manager.find_user_by(email=email)
@@ -86,7 +86,7 @@ class AuthenticationService:
             session_id (str): The session ID.
 
         Returns:
-            User: The user associated with the session ID, or None if not found.
+            User: The user associated with the session ID.
         """
         if not session_id:
             return None
@@ -100,7 +100,7 @@ class AuthenticationService:
         Ends a user's session.
 
         Args:
-            user_id (int): The ID of the user whose session should be terminated.
+            user_id (int): The ID of the user whose session.
         """
         self._db_manager.update_user(user_id, session_id=None)
 
@@ -141,7 +141,8 @@ class AuthenticationService:
         except NoResultFound:
             raise ValueError("Invalid reset token.")
         hashed_password = _hash_password(new_password)
-        self._db_manager.update_user(user.id, hashed_password=hashed_password, reset_token=None)
+        self._db_manager.update_user(user.id, hashed_password=hashed_password,
+                                     reset_token=None)
 
 
 def _hash_password(password: str) -> bytes:
