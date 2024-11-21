@@ -13,7 +13,7 @@ from sqlalchemy import Column, Integer, String
 # reset_token, a nullable string
 
 
-engine = create_engine('sqlite:///:memory:', echo=True)
+engine = create_engine('sqlite:///:memory:', echo=False)
 Base = declarative_base()
 
 
