@@ -1,12 +1,11 @@
+#!/usr/bin/env python3
 """Authentication module to manage user registration."""
 
 import logging
 from typing import Union
 from uuid import uuid4
-
 import bcrypt
 from sqlalchemy.orm.exc import NoResultFound
-
 from db import DB
 from user import User
 
