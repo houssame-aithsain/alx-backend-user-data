@@ -1,69 +1,112 @@
 #!/usr/bin/env python3
 """
-DB module for interacting with the database.
+Database module for managing user records.
 """
-
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, tuple_
+from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.orm.exc import NoResultFound
-from sqlalchemy.exc import InvalidRequestError
 from user import Base, User
 
 
-class DB:
+class DatabaseManager:
     """
-    Handles interactions with the database.
+    A class to manage database operations for user records.
     """
 
     def __init__(self) -> None:
-        """Initializes the DB instance."""
-        self._engine = create_engine("sqlite:///a.db", echo=True)
-        Base.metadata.drop_all(self._engine)
-        Base.metadata.create_all(self._engine)
-        self.__session = None
+        """
+        Initializes a new DatabaseManager instance.
+        Sets up the database engine and schema.
+        """
+        self._engine = create_engine("sqlite:///users.db")
+        Base.metadata.drop_all(self._engine)  # Reset the database for fresh use
+        Base.metadata.create_all(self._engine)  # Create all tables
+        self._session_instance = None
 
     @property
     def _session(self) -> Session:
-        """Creates or retrieves the session."""
-        if self.__session is None:
-            DBSession = sessionmaker(bind=self._engine)
-            self.__session = DBSession()
-        return self.__session
+        """
+        Provides a memoized session object for interacting with the database.
+
+        Returns:
+            Session: The SQLAlchemy session instance.
+        """
+        if self._session_instance is None:
+            SessionFactory = sessionmaker(bind=self._engine)
+            self._session_instance = SessionFactory()
+        return self._session_instance
 
     def add_user(self, email: str, hashed_password: str) -> User:
         """
         Adds a new user to the database.
 
         Args:
-            email (str): The user's email.
-            hashed_password (str): The hashed password.
+            email (str): The user's email address.
+            hashed_password (str): The hashed password for the user.
 
         Returns:
-            User: The created user.
+            User: The newly created user object.
         """
-        new_user = User(email=email, hashed_password=hashed_password)
-        self._session.add(new_user)
-        self._session.commit()
-        return new_user
+        session = self._session
+        try:
+            new_user = User(email=email, hashed_password=hashed_password)
+            session.add(new_user)
+            session.commit()
+            return new_user
+        except Exception:
+            session.rollback()
+            raise  # Allow exceptions to propagate for better error handling
 
-    def find_user_by(self, **kwargs) -> User:
+    def find_user_by(self, **filters) -> User:
         """
-        Finds a user by the given criteria.
+        Finds a user in the database using provided attributes.
 
         Args:
-            **kwargs: Arbitrary keyword arguments for filtering.
+            **filters: Keyword arguments for the user attributes to search for.
 
         Returns:
-            User: The first matching user.
+            User: The user object matching the filters.
 
         Raises:
-            NoResultFound: If no user matches the criteria.
-            InvalidRequestError: If invalid query arguments are passed.
+            InvalidRequestError: If any filter attribute is invalid.
+            NoResultFound: If no user matches the provided filters.
         """
-        try:
-            user = self._session.query(User).filter_by(**kwargs).first()
-            if not user:
-                raise NoResultFound
-            return user
-        except TypeError:
-            raise InvalidRequestError
+        session = self._session
+        attributes, values = [], []
+
+        # Validate and prepare filters
+        for attribute, value in filters.items():
+            if not hasattr(User, attribute):
+                raise InvalidRequestError(f"Invalid attribute: {attribute}")
+            attributes.append(getattr(User, attribute))
+            values.append(value)
+
+        # Execute the query
+        query = session.query(User)
+        user = query.filter(tuple_(*attributes).in_([tuple(values)])).first()
+        if not user:
+            raise NoResultFound("No user found matching the given criteria.")
+        return user
+
+    def update_user(self, user_id: int, **updates) -> None:
+        """
+        Updates attributes of an existing user in the database.
+
+        Args:
+            user_id (int): The ID of the user to update.
+            **updates: Keyword arguments for the attributes to update.
+
+        Raises:
+            ValueError: If any update attribute is invalid.
+        """
+        session = self._session
+        user = self.find_user_by(id=user_id)
+
+        # Update attributes
+        for attribute, value in updates.items():
+            if not hasattr(User, attribute):
+                raise ValueError(f"Invalid attribute: {attribute}")
+            setattr(user, attribute, value)
+
+        session.commit()
