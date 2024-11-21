@@ -12,6 +12,14 @@ from user import User
 logging.disable(logging.WARNING)
 
 
+def _generate_uuid() -> str:
+    """Generates a unique identifier.
+
+    Returns:
+        str: A string representation of the new UUID.
+    """
+    return str(uuid4())
+
 def _hash_password(password: str) -> bytes:
     """Hashes a password using bcrypt.
 
@@ -22,15 +30,6 @@ def _hash_password(password: str) -> bytes:
         bytes: The hashed password.
     """
     return bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
-
-
-def _generate_uuid() -> str:
-    """Generates a unique identifier.
-
-    Returns:
-        str: A string representation of the new UUID.
-    """
-    return str(uuid4())
 
 
 class Auth:
