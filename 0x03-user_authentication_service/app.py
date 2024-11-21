@@ -43,7 +43,7 @@ def register_user() -> str:
 
 
 @app.route("/sessions", methods=["POST"], strict_slashes=False)
-def login_user() -> str:
+def login() -> str:
     """Handle POST requests to log in a user.
 
     Returns:
