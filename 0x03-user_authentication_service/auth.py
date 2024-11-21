@@ -12,7 +12,16 @@ from user import User
 logging.disable(logging.WARNING)
 
 
-def hash_password(plain_password: str) -> bytes:
+def _generate_uuid() -> str:
+    """Generates a unique identifier.
+
+    Returns:
+        str: A string representation of the new UUID.
+    """
+    return str(uuid4())
+
+
+def _hash_password(plain_password: str) -> bytes:
     """Hashes a password using bcrypt.
 
     Args:
@@ -22,15 +31,6 @@ def hash_password(plain_password: str) -> bytes:
         bytes: The hashed password.
     """
     return bcrypt.hashpw(plain_password.encode("utf-8"), bcrypt.gensalt())
-
-
-def generate_uuid() -> str:
-    """Generates a unique identifier.
-
-    Returns:
-        str: A string representation of the new UUID.
-    """
-    return str(uuid4())
 
 
 class Auth:
@@ -58,7 +58,7 @@ class Auth:
         except NoResultFound:
             pass
 
-        hashed_password = hash_password(plain_password)
+        hashed_password = _hash_password(plain_password)
         return self._db.add_user(email, hashed_password)
 
     def valid_login(self, email: str, plain_password: str) -> bool:
@@ -95,7 +95,7 @@ class Auth:
         except NoResultFound:
             return None
 
-        session_id = generate_uuid()
+        session_id = _generate_uuid()
         self._db.update_user(user.id, session_id=session_id)
         return session_id
 
@@ -142,7 +142,7 @@ class Auth:
         except NoResultFound:
             raise ValueError("User with this email does not exist")
 
-        reset_token = generate_uuid()
+        reset_token = _generate_uuid()
         self._db.update_user(user.id, reset_token=reset_token)
         return reset_token
 
@@ -161,6 +161,6 @@ class Auth:
         except NoResultFound:
             raise ValueError("Invalid reset token")
 
-        new_hashed_password = hash_password(new_password)
+        new_hashed_password = _hash_password(new_password)
         self._db.update_user(user.id, hashed_password=new_hashed_password,
                              reset_token=None)
