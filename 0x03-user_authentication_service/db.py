@@ -9,33 +9,26 @@ from sqlalchemy.orm.exc import NoResultFound
 from user import Base, User
 
 
-class DatabaseManager:
-    """
-    A class to manage database operations for user records.
+class DB:
+    """DB class
     """
 
     def __init__(self) -> None:
+        """Initialize a new DB instance
         """
-        Initializes a new DatabaseManager instance.
-        Sets up the database engine and schema.
-        """
-        self._engine = create_engine("sqlite:///users.db", echo=False)
+        self._engine = create_engine("sqlite:///a.db", echo=True)
         Base.metadata.drop_all(self._engine)
-        Base.metadata.create_all(self._engine)  # Create all tables
-        self._session_instance = None
+        Base.metadata.create_all(self._engine)
+        self.__session = None
 
     @property
     def _session(self) -> Session:
+        """Memoized session object
         """
-        Provides a memoized session object for interacting with the database.
-
-        Returns:
-            Session: The SQLAlchemy session instance.
-        """
-        if self._session_instance is None:
-            SessionFactory = sessionmaker(bind=self._engine)
-            self._session_instance = SessionFactory()
-        return self._session_instance
+        if self.__session is None:
+            DBSession = sessionmaker(bind=self._engine)
+            self.__session = DBSession()
+        return self.__session
 
     def add_user(self, email: str, hashed_password: str) -> User:
         """
