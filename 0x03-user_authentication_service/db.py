@@ -19,7 +19,7 @@ class DatabaseManager:
         Initializes a new DatabaseManager instance.
         Sets up the database engine and schema.
         """
-        self._engine = create_engine("sqlite:///users.db")
+        self._engine = create_engine("sqlite:///users.db", echo=False)
         Base.metadata.drop_all(self._engine)
         Base.metadata.create_all(self._engine)  # Create all tables
         self._session_instance = None
