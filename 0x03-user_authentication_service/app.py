@@ -44,21 +44,22 @@ def register_user() -> str:
 
 @app.route("/sessions", methods=["POST"], strict_slashes=False)
 def login() -> str:
-    """Handle POST requests to log in a user.
-
-    Returns:
-        - JSON response with login status and session cookie.
+    """POST /sessions
+    Return:
+        - JSON payload of the form containing login info.
     """
+    # Get user credentials from form data
     email, password = request.form.get("email"), request.form.get("password")
-
-    if not auth_service.valid_login(email, password):
-        # Invalid credentials, return unauthorized error
+    # Check if the user's credentials are valid
+    if not AUTH.valid_login(email, password):
         abort(401)
-
-    # Create a session and return response with session cookie
-    session_id = auth_service.create_session(email)
+    # Create a new session for the user
+    session_id = AUTH.create_session(email)
+    # Construct a response with a JSON payload
     response = jsonify({"email": email, "message": "logged in"})
+    # Set a cookie with the session ID on the response
     response.set_cookie("session_id", session_id)
+    # Return the response
     return response
 
 
