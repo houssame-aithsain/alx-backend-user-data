@@ -17,7 +17,7 @@ engine = create_engine('sqlite:///:memory:', echo=True)
 Base = declarative_base()
 
 
-class user(Base):
+class User(Base):
     __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True)
