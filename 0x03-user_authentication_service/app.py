@@ -10,7 +10,7 @@ from auth import Auth
 logging.disable(logging.WARNING)
 
 # Initialize the Auth class and Flask application
-auth_service = Auth()
+AUTH = Auth()
 app = Flask(__name__)
 
 
@@ -34,7 +34,7 @@ def register_user() -> str:
 
     try:
         # Attempt to register the user
-        auth_service.register_user(email, password)
+        AUTH.register_user(email, password)
         return jsonify({"email": email, "message": "user created"})
 
     except ValueError:
@@ -71,14 +71,14 @@ def logout_user() -> str:
         - Redirects to the home page if successful.
     """
     session_id = request.cookies.get("session_id")
-    user = auth_service.get_user_from_session_id(session_id)
+    user = AUTH.get_user_from_session_id(session_id)
 
     if user is None:
         # Unauthorized user, abort with forbidden error
         abort(403)
 
     # Destroy the session and redirect to home page
-    auth_service.destroy_session(user.id)
+    AUTH.destroy_session(user.id)
     return redirect("/")
 
 
@@ -89,7 +89,7 @@ def get_user_profile() -> str:
         - JSON response with user's email if logged in.
     """
     session_id = request.cookies.get("session_id")
-    user = auth_service.get_user_from_session_id(session_id)
+    user = AUTH.get_user_from_session_id(session_id)
 
     if user is None:
         # Unauthorized access, abort with forbidden error
@@ -109,7 +109,7 @@ def request_password_reset() -> str:
 
     try:
         # Generate a reset token for the provided email
-        reset_token = auth_service.get_reset_password_token(email)
+        reset_token = AUTH.get_reset_password_token(email)
     except ValueError:
         # Invalid email, return forbidden error
         abort(403)
@@ -129,7 +129,7 @@ def update_user_password() -> str:
 
     try:
         # Attempt to update the password with the provided new password
-        auth_service.update_password(reset_token, new_password)
+        AUTH.update_password(reset_token, new_password)
     except ValueError:
         # Invalid reset token, return forbidden error
         abort(403)
